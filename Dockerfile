@@ -4,11 +4,16 @@
 FROM php:8.2-fpm
 
 # Install system dependencies
-RUN apt-get update && apt-get install -y \
-    git curl zip unzip \
-    nginx supervisor \
-    libzip-dev libonig-dev libpng-dev libxml2-dev \
-    && docker-php-ext-install pdo pdo_mysql zip mbstring tokenizer xml gd
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+        git curl zip unzip \
+        nginx supervisor \
+        libzip-dev libonig-dev libpng-dev libxml2-dev \
+        libfreetype6-dev libjpeg62-turbo-dev \
+    && docker-php-ext-configure gd --with-freetype --with-jpeg \
+    && docker-php-ext-install pdo pdo_mysql zip mbstring xml gd \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
 # -----------------------------------------
 # Install Composer
