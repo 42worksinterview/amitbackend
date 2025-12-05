@@ -10,8 +10,9 @@ RUN apt-get update \
         nginx supervisor \
         libzip-dev libonig-dev libpng-dev libxml2-dev \
         libfreetype6-dev libjpeg62-turbo-dev \
+        libpq-dev \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install pdo pdo_mysql zip mbstring xml gd \
+    && docker-php-ext-install pdo pdo_pgsql pdo_mysql zip mbstring xml gd \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
@@ -41,12 +42,12 @@ RUN rm /etc/nginx/sites-enabled/default
 COPY .deploy/nginx.conf /etc/nginx/sites-enabled/laravel.conf
 
 # -----------------------------------------
-# Supervisor to run PHP-FPM + Nginx
+# Configure Supervisor to run PHP-FPM + Nginx
 # -----------------------------------------
 COPY .deploy/supervisor.conf /etc/supervisor/conf.d/supervisor.conf
 
-# Expose port
+# Expose HTTP port
 EXPOSE 80
 
 # Start Supervisor
-CMD ["/usr/bin/supervisord"]
+CMD ["/usr/bin/supervisord", "-n"]
